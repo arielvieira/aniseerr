@@ -14,6 +14,7 @@ import ErrorPage from '@app/pages/_error';
 import defineMessages from '@app/utils/defineMessages';
 import { BarsArrowDownIcon, FunnelIcon } from '@heroicons/react/24/solid';
 import type { MovieSortOptions as TMDBSortOptions } from '@server/api/themoviedb';
+import { ANIME_KEYWORD_ID } from '@server/api/themoviedb/constants';
 import type { MovieResult } from '@server/models/Search';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -21,6 +22,7 @@ import { useIntl } from 'react-intl';
 
 const messages = defineMessages('components.Discover.DiscoverMovies', {
   discovermovies: 'Movies',
+  discoveranime: 'Anime Movies',
   activefilters:
     '{count, plural, one {# Active Filter} other {# Active Filters}}',
   sortPopularityAsc: 'Popularity Ascending',
@@ -44,12 +46,24 @@ const SortOptions: Record<string, TMDBSortOptions> = {
   TitleDesc: 'original_title.desc',
 } as const;
 
-const DiscoverMovies = () => {
+interface DiscoverMoviesProps {
+  isAnime?: boolean;
+}
+
+const DiscoverMovies = ({ isAnime = false }: DiscoverMoviesProps) => {
   const intl = useIntl();
   const router = useRouter();
   const updateQueryParams = useUpdateQueryParams({});
 
   const preparedFilters = prepareFilterValues(router.query);
+  const discoverFilters = isAnime
+    ? {
+        ...preparedFilters,
+        keywords: [ANIME_KEYWORD_ID, preparedFilters.keywords]
+          .filter(Boolean)
+          .join(','),
+      }
+    : preparedFilters;
 
   const {
     isLoadingInitialData,
@@ -61,7 +75,7 @@ const DiscoverMovies = () => {
     error,
   } = useDiscover<MovieResult, unknown, FilterOptions>(
     '/api/v1/discover/movies',
-    preparedFilters
+    discoverFilters
   );
   const [showFilters, setShowFilters] = useState(false);
 
@@ -69,7 +83,9 @@ const DiscoverMovies = () => {
     return <ErrorPage statusCode={500} />;
   }
 
-  const title = intl.formatMessage(messages.discovermovies);
+  const title = intl.formatMessage(
+    isAnime ? messages.discoveranime : messages.discovermovies
+  );
 
   return (
     <>

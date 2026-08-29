@@ -118,6 +118,12 @@ export interface MetadataSettings {
   anime: MetadataProviderType;
 }
 
+export interface DiscoverMediaSettings {
+  anime: boolean;
+  movie: boolean;
+  tv: boolean;
+}
+
 export interface ProxySettings {
   enabled: boolean;
   hostname: string;
@@ -146,6 +152,7 @@ export interface MainSettings {
   mediaServerLogin: boolean;
   newPlexLogin: boolean;
   discoverRegion: string;
+  discoverMediaTypes: DiscoverMediaSettings;
   streamingRegion: string;
   originalLanguage: string;
   blocklistRegion: string;
@@ -201,6 +208,7 @@ interface FullPublicSettings extends PublicSettings {
   movie4kEnabled: boolean;
   series4kEnabled: boolean;
   discoverRegion: string;
+  discoverMediaTypes: DiscoverMediaSettings;
   streamingRegion: string;
   originalLanguage: string;
   mediaServerType: number;
@@ -424,6 +432,11 @@ class Settings {
         mediaServerLogin: true,
         newPlexLogin: true,
         discoverRegion: '',
+        discoverMediaTypes: {
+          anime: true,
+          movie: false,
+          tv: false,
+        },
         streamingRegion: '',
         originalLanguage: '',
         blocklistRegion: '',
@@ -729,6 +742,7 @@ class Settings {
         (sonarr) => sonarr.is4k && sonarr.isDefault
       ),
       discoverRegion: this.data.main.discoverRegion,
+      discoverMediaTypes: this.data.main.discoverMediaTypes,
       streamingRegion: this.data.main.streamingRegion,
       originalLanguage: this.data.main.originalLanguage,
       mediaServerType: this.main.mediaServerType,

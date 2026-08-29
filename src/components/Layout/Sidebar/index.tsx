@@ -1,6 +1,7 @@
 import Badge from '@app/components/Common/Badge';
 import VersionStatus from '@app/components/Layout/VersionStatus';
 import useClickOutside from '@app/hooks/useClickOutside';
+import useSettings from '@app/hooks/useSettings';
 import { Permission, useUser } from '@app/hooks/useUser';
 import defineMessages from '@app/utils/defineMessages';
 import { Transition, TransitionChild } from '@headlessui/react';
@@ -10,6 +11,7 @@ import {
   ExclamationTriangleIcon,
   EyeSlashIcon,
   FilmIcon,
+  PlayCircleIcon,
   SparklesIcon,
   TvIcon,
   UsersIcon,
@@ -23,6 +25,7 @@ import { useIntl } from 'react-intl';
 
 export const menuMessages = defineMessages('components.Layout.Sidebar', {
   dashboard: 'Discover',
+  browseanime: 'Anime',
   browsemovies: 'Movies',
   browsetv: 'Series',
   requests: 'Requests',
@@ -50,6 +53,7 @@ interface SidebarLinkProps {
   requiredPermission?: Permission | Permission[];
   permissionType?: 'and' | 'or';
   dataTestId?: string;
+  mediaType?: 'anime' | 'movie' | 'tv';
 }
 
 const SidebarLinks: SidebarLinkProps[] = [
@@ -60,16 +64,25 @@ const SidebarLinks: SidebarLinkProps[] = [
     activeRegExp: /^\/(discover\/?)?$/,
   },
   {
+    href: '/discover/anime',
+    messagesKey: 'browseanime',
+    svgIcon: <PlayCircleIcon className="mr-3 h-6 w-6" />,
+    activeRegExp: /^\/discover\/anime/,
+    mediaType: 'anime',
+  },
+  {
     href: '/discover/movies',
     messagesKey: 'browsemovies',
     svgIcon: <FilmIcon className="mr-3 h-6 w-6" />,
     activeRegExp: /^\/discover\/movies$/,
+    mediaType: 'movie',
   },
   {
     href: '/discover/tv',
     messagesKey: 'browsetv',
     svgIcon: <TvIcon className="mr-3 h-6 w-6" />,
     activeRegExp: /^\/discover\/tv$/,
+    mediaType: 'tv',
   },
   {
     href: '/requests',
@@ -130,6 +143,7 @@ const Sidebar = ({
   const router = useRouter();
   const intl = useIntl();
   const { hasPermission } = useUser();
+  const { currentSettings } = useSettings();
   useClickOutside(navRef, () => setClosed());
 
   useEffect(() => {
@@ -197,12 +211,17 @@ const Sidebar = ({
                       </span>
                     </div>
                     <nav className="mt-10 flex-1 space-y-4 px-4">
-                      {SidebarLinks.filter((link) =>
-                        link.requiredPermission
-                          ? hasPermission(link.requiredPermission, {
-                              type: link.permissionType ?? 'and',
-                            })
-                          : true
+                      {SidebarLinks.filter(
+                        (link) =>
+                          (!link.mediaType ||
+                            currentSettings.discoverMediaTypes[
+                              link.mediaType
+                            ]) &&
+                          (link.requiredPermission
+                            ? hasPermission(link.requiredPermission, {
+                                type: link.permissionType ?? 'and',
+                              })
+                            : true)
                       ).map((sidebarLink) => {
                         return (
                           <Link
@@ -265,12 +284,15 @@ const Sidebar = ({
                 </span>
               </div>
               <nav className="mt-8 flex-1 space-y-4 px-4">
-                {SidebarLinks.filter((link) =>
-                  link.requiredPermission
-                    ? hasPermission(link.requiredPermission, {
-                        type: link.permissionType ?? 'and',
-                      })
-                    : true
+                {SidebarLinks.filter(
+                  (link) =>
+                    (!link.mediaType ||
+                      currentSettings.discoverMediaTypes[link.mediaType]) &&
+                    (link.requiredPermission
+                      ? hasPermission(link.requiredPermission, {
+                          type: link.permissionType ?? 'and',
+                        })
+                      : true)
                 ).map((sidebarLink) => {
                   return (
                     <Link

@@ -15,6 +15,7 @@ import TvGenreSlider from '@app/components/Discover/TvGenreSlider';
 import { sliderTitles } from '@app/components/Discover/constants';
 import MediaSlider from '@app/components/MediaSlider';
 import { encodeURIExtraParams } from '@app/hooks/useDiscover';
+import useSettings from '@app/hooks/useSettings';
 import useToasts from '@app/hooks/useToasts';
 import { Permission, useUser } from '@app/hooks/useUser';
 import globalMessages from '@app/i18n/globalMessages';
@@ -27,7 +28,11 @@ import {
   PencilIcon,
   PlusIcon,
 } from '@heroicons/react/24/solid';
-import { DiscoverSliderType } from '@server/constants/discover';
+import { ANIME_KEYWORD_ID } from '@server/api/themoviedb/constants';
+import {
+  DiscoverSliderType,
+  isDiscoverSliderVisible,
+} from '@server/constants/discover';
 import type DiscoverSlider from '@server/entity/DiscoverSlider';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
@@ -55,6 +60,7 @@ const messages = defineMessages('components.Discover', {
 const Discover = () => {
   const intl = useIntl();
   const { hasPermission } = useUser();
+  const { currentSettings } = useSettings();
   const { addToast } = useToasts();
   const {
     data: discoverData,
@@ -209,6 +215,13 @@ const Discover = () => {
         </>
       )}
       {(isEditing ? sliders : discoverData)?.map((slider, index) => {
+        if (
+          !isEditing &&
+          !isDiscoverSliderVisible(slider, currentSettings.discoverMediaTypes)
+        ) {
+          return null;
+        }
+
         let sliderComponent: React.ReactNode;
 
         switch (slider.type) {
@@ -395,6 +408,50 @@ const Discover = () => {
                 linkUrl={`/discover/tv?watchRegion=${
                   slider.data?.split(',')[0]
                 }&watchProviders=${slider.data?.split(',')[1]}`}
+              />
+            );
+            break;
+          case DiscoverSliderType.POPULAR_ANIME_SERIES:
+            sliderComponent = (
+              <MediaSlider
+                sliderKey="popular-anime-series"
+                title={intl.formatMessage(sliderTitles.popularAnimeSeries)}
+                url="/api/v1/discover/tv"
+                extraParams={`keywords=${ANIME_KEYWORD_ID}`}
+                linkUrl="/discover/anime/series"
+              />
+            );
+            break;
+          case DiscoverSliderType.POPULAR_ANIME_MOVIES:
+            sliderComponent = (
+              <MediaSlider
+                sliderKey="popular-anime-movies"
+                title={intl.formatMessage(sliderTitles.popularAnimeMovies)}
+                url="/api/v1/discover/movies"
+                extraParams={`keywords=${ANIME_KEYWORD_ID}`}
+                linkUrl="/discover/anime/movies"
+              />
+            );
+            break;
+          case DiscoverSliderType.UPCOMING_ANIME_SERIES:
+            sliderComponent = (
+              <MediaSlider
+                sliderKey="upcoming-anime-series"
+                title={intl.formatMessage(sliderTitles.upcomingAnimeSeries)}
+                url="/api/v1/discover/tv"
+                extraParams={`keywords=${ANIME_KEYWORD_ID}&firstAirDateGte=${upcomingDate}`}
+                linkUrl={`/discover/anime/series?firstAirDateGte=${upcomingDate}`}
+              />
+            );
+            break;
+          case DiscoverSliderType.UPCOMING_ANIME_MOVIES:
+            sliderComponent = (
+              <MediaSlider
+                sliderKey="upcoming-anime-movies"
+                title={intl.formatMessage(sliderTitles.upcomingAnimeMovies)}
+                url="/api/v1/discover/movies"
+                extraParams={`keywords=${ANIME_KEYWORD_ID}&primaryReleaseDateGte=${upcomingDate}`}
+                linkUrl={`/discover/anime/movies?primaryReleaseDateGte=${upcomingDate}`}
               />
             );
             break;

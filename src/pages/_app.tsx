@@ -250,6 +250,11 @@ CoreApp.getInitialProps = async (initialProps) => {
     localLogin: true,
     mediaServerLogin: true,
     discoverRegion: '',
+    discoverMediaTypes: {
+      anime: true,
+      movie: false,
+      tv: false,
+    },
     streamingRegion: '',
     originalLanguage: '',
     mediaServerType: MediaServerType.NOT_CONFIGURED,

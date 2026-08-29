@@ -1,16 +1,32 @@
 import useSearchInput from '@app/hooks/useSearchInput';
+import useSettings from '@app/hooks/useSettings';
 import defineMessages from '@app/utils/defineMessages';
 import { XCircleIcon } from '@heroicons/react/24/outline';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/solid';
 import { useIntl } from 'react-intl';
 
 const messages = defineMessages('components.Layout.SearchInput', {
-  searchPlaceholder: 'Search Movies & Series',
+  searchPlaceholder: 'Search {mediaTypes}',
+  anime: 'Anime',
+  movies: 'Movies',
+  series: 'Series',
 });
 
 const SearchInput = () => {
   const intl = useIntl();
+  const { currentSettings } = useSettings();
   const { searchValue, setSearchValue, setIsOpen, clear } = useSearchInput();
+  const visibleMediaTypes = [
+    currentSettings.discoverMediaTypes.anime
+      ? intl.formatMessage(messages.anime)
+      : null,
+    currentSettings.discoverMediaTypes.movie
+      ? intl.formatMessage(messages.movies)
+      : null,
+    currentSettings.discoverMediaTypes.tv
+      ? intl.formatMessage(messages.series)
+      : null,
+  ].filter((mediaType): mediaType is string => Boolean(mediaType));
   return (
     <div className="flex flex-1">
       <div className="flex w-full">
@@ -25,7 +41,11 @@ const SearchInput = () => {
             id="search_field"
             style={{ paddingRight: searchValue.length > 0 ? '1.75rem' : '' }}
             className="block w-full rounded-full border border-gray-600 bg-gray-900/80 py-2 pl-10 text-white placeholder-gray-300 hover:border-gray-500 focus:border-gray-500 focus:bg-gray-900 focus:placeholder-gray-400 focus:outline-none focus:ring-0 sm:text-base"
-            placeholder={intl.formatMessage(messages.searchPlaceholder)}
+            placeholder={intl.formatMessage(messages.searchPlaceholder, {
+              mediaTypes: intl.formatList(visibleMediaTypes, {
+                type: 'conjunction',
+              }),
+            })}
             type="search"
             autoComplete="off"
             value={searchValue}

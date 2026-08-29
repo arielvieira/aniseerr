@@ -256,6 +256,24 @@ components:
         versionCheck:
           type: boolean
           example: false
+        discoverMediaTypes:
+          $ref: '#/components/schemas/DiscoverMediaSettings'
+    DiscoverMediaSettings:
+      type: object
+      required:
+        - anime
+        - movie
+        - tv
+      properties:
+        anime:
+          type: boolean
+          example: true
+        movie:
+          type: boolean
+          example: false
+        tv:
+          type: boolean
+          example: false
     NetworkSettings:
       type: object
       properties:
@@ -720,6 +738,8 @@ components:
           format: uuid
           description: Instance Plex OAuth client identifier
           example: 6919275e-142a-48d8-be6b-93594cbd4626
+        discoverMediaTypes:
+          $ref: '#/components/schemas/DiscoverMediaSettings'
     MovieResult:
       type: object
       required:

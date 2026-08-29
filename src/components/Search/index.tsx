@@ -34,7 +34,12 @@ const Search = () => {
     {
       query: router.query.query,
     },
-    { hideAvailable: false, hideBlocklisted: false, hideRequested: false }
+    {
+      hideAvailable: false,
+      hideBlocklisted: false,
+      hideRequested: false,
+      allowSparseResults: true,
+    }
   );
 
   if (error) {

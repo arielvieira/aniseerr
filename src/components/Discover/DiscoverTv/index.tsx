@@ -14,6 +14,7 @@ import ErrorPage from '@app/pages/_error';
 import defineMessages from '@app/utils/defineMessages';
 import { BarsArrowDownIcon, FunnelIcon } from '@heroicons/react/24/solid';
 import type { TvSortOptions as TMDBSortOptions } from '@server/api/themoviedb';
+import { ANIME_KEYWORD_ID } from '@server/api/themoviedb/constants';
 import type { TvResult } from '@server/models/Search';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -21,6 +22,7 @@ import { useIntl } from 'react-intl';
 
 const messages = defineMessages('components.Discover.DiscoverTv', {
   discovertv: 'Series',
+  discoveranime: 'Anime Series',
   activefilters:
     '{count, plural, one {# Active Filter} other {# Active Filters}}',
   sortPopularityAsc: 'Popularity Ascending',
@@ -44,11 +46,23 @@ const SortOptions: Record<string, TMDBSortOptions> = {
   TitleDesc: 'original_name.desc',
 } as const;
 
-const DiscoverTv = () => {
+interface DiscoverTvProps {
+  isAnime?: boolean;
+}
+
+const DiscoverTv = ({ isAnime = false }: DiscoverTvProps) => {
   const intl = useIntl();
   const router = useRouter();
   const [showFilters, setShowFilters] = useState(false);
   const preparedFilters = prepareFilterValues(router.query);
+  const discoverFilters = isAnime
+    ? {
+        ...preparedFilters,
+        keywords: [ANIME_KEYWORD_ID, preparedFilters.keywords]
+          .filter(Boolean)
+          .join(','),
+      }
+    : preparedFilters;
   const updateQueryParams = useUpdateQueryParams({});
 
   const {
@@ -60,14 +74,16 @@ const DiscoverTv = () => {
     fetchMore,
     error,
   } = useDiscover<TvResult, never, FilterOptions>('/api/v1/discover/tv', {
-    ...preparedFilters,
+    ...discoverFilters,
   });
 
   if (error) {
     return <ErrorPage statusCode={500} />;
   }
 
-  const title = intl.formatMessage(messages.discovertv);
+  const title = intl.formatMessage(
+    isAnime ? messages.discoveranime : messages.discovertv
+  );
 
   return (
     <>

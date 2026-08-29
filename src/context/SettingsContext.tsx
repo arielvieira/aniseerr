@@ -20,6 +20,11 @@ const defaultSettings = {
   movie4kEnabled: false,
   series4kEnabled: false,
   discoverRegion: '',
+  discoverMediaTypes: {
+    anime: true,
+    movie: false,
+    tv: false,
+  },
   streamingRegion: '',
   originalLanguage: '',
   mediaServerType: MediaServerType.NOT_CONFIGURED,

@@ -36,6 +36,12 @@ const messages = defineMessages('components.Settings.SettingsMain', {
   applicationurl: 'Application URL',
   discoverRegion: 'Discover Region',
   discoverRegionTip: 'Filter content by regional availability',
+  discoverMediaTypes: 'Discover Navigation',
+  discoverMediaTypesTip:
+    'Choose which media tabs and discovery sections are visible to users.',
+  anime: 'Anime',
+  movies: 'Movies',
+  series: 'Series',
   originallanguage: 'Discover Language',
   originallanguageTip: 'Filter content by original language',
   blocklistRegion: 'Blocklist Region',
@@ -80,6 +86,7 @@ const messages = defineMessages('components.Settings.SettingsMain', {
   versionCheck: 'Version Check',
   versionCheckTip: 'Automatically check for new versions on GitHub.',
   validationUrl: 'You must provide a valid URL',
+  validationDiscoverMediaTypes: 'Enable at least one media tab',
 });
 
 const SettingsMain = () => {
@@ -123,6 +130,17 @@ const SettingsMain = () => {
         (value) => (value ?? 0) <= 250
       ),
     youtubeUrl: Yup.string().url(intl.formatMessage(messages.validationUrl)),
+    discoverMediaTypes: Yup.object()
+      .shape({
+        anime: Yup.boolean().required(),
+        movie: Yup.boolean().required(),
+        tv: Yup.boolean().required(),
+      })
+      .test(
+        'at-least-one-media-type',
+        intl.formatMessage(messages.validationDiscoverMediaTypes),
+        (value) => Boolean(value?.anime || value?.movie || value?.tv)
+      ),
   });
 
   const regenerate = async () => {
@@ -172,6 +190,11 @@ const SettingsMain = () => {
             hideRequested: data?.hideRequested,
             locale: data?.locale ?? 'en',
             discoverRegion: data?.discoverRegion,
+            discoverMediaTypes: data?.discoverMediaTypes ?? {
+              anime: true,
+              movie: false,
+              tv: false,
+            },
             originalLanguage: data?.originalLanguage,
             streamingRegion: data?.streamingRegion || 'US',
             blocklistRegion: data?.blocklistRegion || '',
@@ -196,6 +219,7 @@ const SettingsMain = () => {
                 hideRequested: values.hideRequested,
                 locale: values.locale,
                 discoverRegion: values.discoverRegion,
+                discoverMediaTypes: values.discoverMediaTypes,
                 streamingRegion: values.streamingRegion,
                 originalLanguage: values.originalLanguage,
                 blocklistRegion: values.blocklistRegion,
@@ -315,6 +339,41 @@ const SettingsMain = () => {
                       typeof errors.applicationUrl === 'string' && (
                         <div className="error">{errors.applicationUrl}</div>
                       )}
+                  </div>
+                </div>
+                <div className="form-row">
+                  <div className="text-label">
+                    <span>
+                      {intl.formatMessage(messages.discoverMediaTypes)}
+                    </span>
+                    <span className="label-tip">
+                      {intl.formatMessage(messages.discoverMediaTypesTip)}
+                    </span>
+                  </div>
+                  <div className="form-input-area space-y-2">
+                    {(
+                      [
+                        ['anime', messages.anime],
+                        ['movie', messages.movies],
+                        ['tv', messages.series],
+                      ] as const
+                    ).map(([mediaType, label]) => (
+                      <label
+                        key={mediaType}
+                        htmlFor={`discoverMediaTypes.${mediaType}`}
+                        className="flex items-center space-x-2 text-gray-100"
+                      >
+                        <Field
+                          type="checkbox"
+                          id={`discoverMediaTypes.${mediaType}`}
+                          name={`discoverMediaTypes.${mediaType}`}
+                        />
+                        <span>{intl.formatMessage(label)}</span>
+                      </label>
+                    ))}
+                    {typeof errors.discoverMediaTypes === 'string' && (
+                      <div className="error">{errors.discoverMediaTypes}</div>
+                    )}
                   </div>
                 </div>
                 <div className="form-row">

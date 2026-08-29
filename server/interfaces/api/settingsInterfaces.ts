@@ -1,3 +1,4 @@
+import type { DiscoverMediaSettings } from '@server/lib/settings';
 import type { DnsEntries, DnsStats } from 'dns-caching';
 import type { PaginatedResponse } from './common';
 
@@ -37,6 +38,7 @@ export interface PublicSettingsResponse {
   movie4kEnabled: boolean;
   series4kEnabled: boolean;
   discoverRegion: string;
+  discoverMediaTypes: DiscoverMediaSettings;
   streamingRegion: string;
   originalLanguage: string;
   mediaServerType: number;

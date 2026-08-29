@@ -1,6 +1,7 @@
 import Badge from '@app/components/Common/Badge';
 import { menuMessages } from '@app/components/Layout/Sidebar';
 import useClickOutside from '@app/hooks/useClickOutside';
+import useSettings from '@app/hooks/useSettings';
 import { Permission, useUser } from '@app/hooks/useUser';
 import { Transition } from '@headlessui/react';
 import {
@@ -10,6 +11,7 @@ import {
   ExclamationTriangleIcon,
   EyeSlashIcon,
   FilmIcon,
+  PlayCircleIcon,
   SparklesIcon,
   TvIcon,
   UsersIcon,
@@ -20,6 +22,7 @@ import {
   ExclamationTriangleIcon as FilledExclamationTriangleIcon,
   EyeSlashIcon as FilledEyeSlashIcon,
   FilmIcon as FilledFilmIcon,
+  PlayCircleIcon as FilledPlayCircleIcon,
   SparklesIcon as FilledSparklesIcon,
   TvIcon as FilledTvIcon,
   UsersIcon as FilledUsersIcon,
@@ -47,6 +50,7 @@ interface MenuLink {
   requiredPermission?: Permission | Permission[];
   permissionType?: 'and' | 'or';
   dataTestId?: string;
+  mediaType?: 'anime' | 'movie' | 'tv';
 }
 
 const MobileMenu = ({
@@ -59,6 +63,7 @@ const MobileMenu = ({
   const intl = useIntl();
   const [isOpen, setIsOpen] = useState(false);
   const { hasPermission } = useUser();
+  const { currentSettings } = useSettings();
   const router = useRouter();
   useClickOutside(ref, () => {
     setTimeout(() => {
@@ -79,11 +84,20 @@ const MobileMenu = ({
       activeRegExp: /^\/(discover\/?)?$/,
     },
     {
+      href: '/discover/anime',
+      content: intl.formatMessage(menuMessages.browseanime),
+      svgIcon: <PlayCircleIcon className="h-6 w-6" />,
+      svgIconSelected: <FilledPlayCircleIcon className="h-6 w-6" />,
+      activeRegExp: /^\/discover\/anime/,
+      mediaType: 'anime',
+    },
+    {
       href: '/discover/movies',
       content: intl.formatMessage(menuMessages.browsemovies),
       svgIcon: <FilmIcon className="h-6 w-6" />,
       svgIconSelected: <FilledFilmIcon className="h-6 w-6" />,
       activeRegExp: /^\/discover\/movies$/,
+      mediaType: 'movie',
     },
     {
       href: '/discover/tv',
@@ -91,6 +105,7 @@ const MobileMenu = ({
       svgIcon: <TvIcon className="h-6 w-6" />,
       svgIconSelected: <FilledTvIcon className="h-6 w-6" />,
       activeRegExp: /^\/discover\/tv$/,
+      mediaType: 'tv',
     },
     {
       href: '/requests',
@@ -146,10 +161,11 @@ const MobileMenu = ({
 
   const filteredLinks = menuLinks.filter(
     (link) =>
-      !link.requiredPermission ||
-      hasPermission(link.requiredPermission, {
-        type: link.permissionType ?? 'and',
-      })
+      (!link.mediaType || currentSettings.discoverMediaTypes[link.mediaType]) &&
+      (!link.requiredPermission ||
+        hasPermission(link.requiredPermission, {
+          type: link.permissionType ?? 'and',
+        }))
   );
 
   useEffect(() => {

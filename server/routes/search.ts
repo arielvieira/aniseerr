@@ -1,7 +1,12 @@
 import TheMovieDb from '@server/api/themoviedb';
+import { ANIME_KEYWORD_ID } from '@server/api/themoviedb/constants';
 import type { TmdbSearchMultiResponse } from '@server/api/themoviedb/interfaces';
 import Media from '@server/entity/Media';
-import { findSearchProvider } from '@server/lib/search';
+import {
+  filterSearchResultsForMediaTypes,
+  findSearchProvider,
+} from '@server/lib/search';
+import { getSettings } from '@server/lib/settings';
 import logger from '@server/logger';
 import { mapSearchResults } from '@server/models/Search';
 import { Router } from 'express';
@@ -12,6 +17,7 @@ searchRoutes.get('/', async (req, res, next) => {
   const queryString = req.query.query as string;
   const searchProvider = findSearchProvider(queryString.toLowerCase());
   let results: TmdbSearchMultiResponse;
+  const tmdb = new TheMovieDb();
 
   try {
     if (searchProvider) {
@@ -24,14 +30,44 @@ searchRoutes.get('/', async (req, res, next) => {
         query: queryString,
       });
     } else {
-      const tmdb = new TheMovieDb();
-
       results = await tmdb.searchMulti({
         query: queryString,
         page: Number(req.query.page),
         language: (req.query.language as string) ?? req.locale,
       });
     }
+
+    results.results = await filterSearchResultsForMediaTypes(
+      results.results,
+      getSettings().main.discoverMediaTypes,
+      async (result) => {
+        try {
+          if (result.media_type === 'movie') {
+            const movie = await tmdb.getMovie({
+              movieId: result.id,
+              language: (req.query.language as string) ?? req.locale,
+            });
+            return movie.keywords.keywords.some(
+              (keyword) => keyword.id === ANIME_KEYWORD_ID
+            );
+          }
+
+          if (result.media_type === 'tv') {
+            const series = await tmdb.getTvShow({
+              tvId: result.id,
+              language: (req.query.language as string) ?? req.locale,
+            });
+            return series.keywords.results.some(
+              (keyword) => keyword.id === ANIME_KEYWORD_ID
+            );
+          }
+        } catch {
+          return false;
+        }
+
+        return false;
+      }
+    );
 
     const media = await Media.getRelatedMedia(
       req.user,

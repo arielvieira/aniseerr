@@ -59,7 +59,12 @@ const useDiscover = <
 >(
   endpoint: string,
   options?: O,
-  { hideAvailable = true, hideBlocklisted = true, hideRequested = true } = {}
+  {
+    hideAvailable = true,
+    hideBlocklisted = true,
+    hideRequested = true,
+    allowSparseResults = false,
+  } = {}
 ): DiscoverResult<T, S> => {
   const settings = useSettings();
   const { hasPermission } = useUser();
@@ -154,11 +159,13 @@ const useDiscover = <
   }
 
   const isEmpty = !isLoadingInitialData && titles?.length === 0;
-  const isReachingEnd =
-    isEmpty ||
-    (!!data && (data[data?.length - 1]?.results.length ?? 0) < 20) ||
-    (!!data && (data[data?.length - 1]?.totalResults ?? 0) <= size * 20) ||
-    (!!data && (data[data?.length - 1]?.totalResults ?? 0) < 41);
+  const lastPage = data?.[data.length - 1];
+  const isReachingEnd = allowSparseResults
+    ? isEmpty || Boolean(lastPage && lastPage.page >= lastPage.totalPages)
+    : isEmpty ||
+      Boolean(lastPage && lastPage.results.length < 20) ||
+      Boolean(lastPage && lastPage.totalResults <= size * 20) ||
+      Boolean(lastPage && lastPage.totalResults < 41);
 
   useEffect(() => {
     if (error && titles.length) {

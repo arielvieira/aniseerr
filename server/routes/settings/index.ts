@@ -58,6 +58,16 @@ const libraryUpdateSchema = z.object({
   enabled: z.boolean(),
 });
 
+const discoverMediaTypesSchema = z
+  .object({
+    anime: z.boolean(),
+    movie: z.boolean(),
+    tv: z.boolean(),
+  })
+  .refine((mediaTypes) => Object.values(mediaTypes).some(Boolean), {
+    message: 'At least one discover media type must be enabled.',
+  });
+
 const filteredMainSettings = (
   user: User,
   main: MainSettings
@@ -81,6 +91,18 @@ settingsRoutes.get('/main', (req, res, next) => {
 
 settingsRoutes.post('/main', async (req, res) => {
   const settings = getSettings();
+
+  if (req.body.discoverMediaTypes) {
+    const result = discoverMediaTypesSchema.safeParse(
+      req.body.discoverMediaTypes
+    );
+
+    if (!result.success) {
+      return res.status(400).json({
+        message: result.error.issues[0]?.message ?? 'Invalid media types.',
+      });
+    }
+  }
 
   settings.main = merge(settings.main, req.body);
   await settings.save();

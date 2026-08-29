@@ -10,6 +10,7 @@ import type {
   TmdbTvDetails,
   TmdbTvResult,
 } from '@server/api/themoviedb/interfaces';
+import type { DiscoverMediaSettings } from '@server/lib/settings';
 import {
   mapMovieDetailsToResult,
   mapPersonDetailsToResult,
@@ -33,6 +34,33 @@ interface SearchProvider {
     query?: string;
   }) => Promise<TmdbSearchMultiResponse>;
 }
+
+type SearchResult = TmdbSearchMultiResponse['results'][number];
+
+export const filterSearchResultsForMediaTypes = async (
+  results: SearchResult[],
+  mediaTypes: DiscoverMediaSettings,
+  isAnime: (result: SearchResult) => Promise<boolean>
+): Promise<SearchResult[]> => {
+  const visibility = await Promise.all(
+    results.map(async (result) => {
+      switch (result.media_type) {
+        case 'movie':
+          return mediaTypes.movie || (mediaTypes.anime && isAnime(result));
+        case 'tv':
+          return mediaTypes.tv || (mediaTypes.anime && isAnime(result));
+        case 'collection':
+          return mediaTypes.movie;
+        case 'person':
+          return mediaTypes.movie || mediaTypes.tv;
+        default:
+          return false;
+      }
+    })
+  );
+
+  return results.filter((_result, index) => visibility[index]);
+};
 
 const searchProviders: SearchProvider[] = [];
 
