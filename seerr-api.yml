@@ -270,10 +270,10 @@ components:
           example: true
         movie:
           type: boolean
-          example: false
+          example: true
         tv:
           type: boolean
-          example: false
+          example: true
     NetworkSettings:
       type: object
       properties:

@@ -252,8 +252,8 @@ CoreApp.getInitialProps = async (initialProps) => {
     discoverRegion: '',
     discoverMediaTypes: {
       anime: true,
-      movie: false,
-      tv: false,
+      movie: true,
+      tv: true,
     },
     streamingRegion: '',
     originalLanguage: '',

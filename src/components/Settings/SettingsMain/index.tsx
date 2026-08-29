@@ -192,8 +192,8 @@ const SettingsMain = () => {
             discoverRegion: data?.discoverRegion,
             discoverMediaTypes: data?.discoverMediaTypes ?? {
               anime: true,
-              movie: false,
-              tv: false,
+              movie: true,
+              tv: true,
             },
             originalLanguage: data?.originalLanguage,
             streamingRegion: data?.streamingRegion || 'US',
