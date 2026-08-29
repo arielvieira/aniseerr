@@ -70,9 +70,13 @@ export const sliderTitles = defineMessages('components.Discover', {
   recentrequests: 'Recent Requests',
   popularmovies: 'Popular Movies',
   populartv: 'Popular Series',
+  popularanimemovies: 'Popular Anime Movies',
+  popularanimeseries: 'Popular Anime Series',
   upcomingtv: 'Upcoming Series',
   recentlyAdded: 'Recently Added',
   upcoming: 'Upcoming Movies',
+  upcominganimemovies: 'Upcoming Anime Movies',
+  upcominganimeseries: 'Upcoming Anime Series',
   trending: 'Trending',
   plexwatchlist: 'Your Watchlist',
   moviegenres: 'Movie Genres',
@@ -88,10 +92,6 @@ export const sliderTitles = defineMessages('components.Discover', {
   tmdbsearch: 'TMDB Search',
   tmdbmoviestreamingservices: 'TMDB Movie Streaming Services',
   tmdbtvstreamingservices: 'TMDB TV Streaming Services',
-  popularAnimeSeries: 'Popular Anime Series',
-  popularAnimeMovies: 'Popular Anime Movies',
-  upcomingAnimeSeries: 'Upcoming Anime Series',
-  upcomingAnimeMovies: 'Upcoming Anime Movies',
 });
 
 export const QueryFilterOptions = z.object({

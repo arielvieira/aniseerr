@@ -170,13 +170,13 @@ const DiscoverSliderEdit = ({
       case DiscoverSliderType.TMDB_TV_STREAMING_SERVICES:
         return intl.formatMessage(sliderTitles.tmdbtvstreamingservices);
       case DiscoverSliderType.POPULAR_ANIME_SERIES:
-        return intl.formatMessage(sliderTitles.popularAnimeSeries);
+        return intl.formatMessage(sliderTitles.popularanimeseries);
       case DiscoverSliderType.POPULAR_ANIME_MOVIES:
-        return intl.formatMessage(sliderTitles.popularAnimeMovies);
+        return intl.formatMessage(sliderTitles.popularanimemovies);
       case DiscoverSliderType.UPCOMING_ANIME_SERIES:
-        return intl.formatMessage(sliderTitles.upcomingAnimeSeries);
+        return intl.formatMessage(sliderTitles.upcominganimeseries);
       case DiscoverSliderType.UPCOMING_ANIME_MOVIES:
-        return intl.formatMessage(sliderTitles.upcomingAnimeMovies);
+        return intl.formatMessage(sliderTitles.upcominganimemovies);
       default:
         return 'Unknown Slider';
     }

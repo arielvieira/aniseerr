@@ -415,7 +415,7 @@ const Discover = () => {
             sliderComponent = (
               <MediaSlider
                 sliderKey="popular-anime-series"
-                title={intl.formatMessage(sliderTitles.popularAnimeSeries)}
+                title={intl.formatMessage(sliderTitles.popularanimeseries)}
                 url="/api/v1/discover/tv"
                 extraParams={`keywords=${ANIME_KEYWORD_ID}`}
                 linkUrl="/discover/anime/series"
@@ -426,7 +426,7 @@ const Discover = () => {
             sliderComponent = (
               <MediaSlider
                 sliderKey="popular-anime-movies"
-                title={intl.formatMessage(sliderTitles.popularAnimeMovies)}
+                title={intl.formatMessage(sliderTitles.popularanimemovies)}
                 url="/api/v1/discover/movies"
                 extraParams={`keywords=${ANIME_KEYWORD_ID}`}
                 linkUrl="/discover/anime/movies"
@@ -437,7 +437,7 @@ const Discover = () => {
             sliderComponent = (
               <MediaSlider
                 sliderKey="upcoming-anime-series"
-                title={intl.formatMessage(sliderTitles.upcomingAnimeSeries)}
+                title={intl.formatMessage(sliderTitles.upcominganimeseries)}
                 url="/api/v1/discover/tv"
                 extraParams={`keywords=${ANIME_KEYWORD_ID}&firstAirDateGte=${upcomingDate}`}
                 linkUrl={`/discover/anime/series?firstAirDateGte=${upcomingDate}`}
@@ -448,7 +448,7 @@ const Discover = () => {
             sliderComponent = (
               <MediaSlider
                 sliderKey="upcoming-anime-movies"
-                title={intl.formatMessage(sliderTitles.upcomingAnimeMovies)}
+                title={intl.formatMessage(sliderTitles.upcominganimemovies)}
                 url="/api/v1/discover/movies"
                 extraParams={`keywords=${ANIME_KEYWORD_ID}&primaryReleaseDateGte=${upcomingDate}`}
                 linkUrl={`/discover/anime/movies?primaryReleaseDateGte=${upcomingDate}`}
